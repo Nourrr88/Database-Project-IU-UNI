@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Campus WiFi Management</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <span>SC</span>
+        <div>
+          <strong>Smart Campus</strong>
+          <small>WiFi + Database</small>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-link active" data-view="overview">Overview</button>
+        <button class="nav-link" data-view="database">Database Lab</button>
+        <button class="nav-link" data-view="users">Users</button>
+        <button class="nav-link" data-view="devices">Devices</button>
+        <button class="nav-link" data-view="sessions">Sessions</button>
+        <button class="nav-link" data-view="network">Network</button>
+        <button class="nav-link" data-view="reports">Reports</button>
+      </nav>
+
+      <div class="side-note">
+        <strong>SQL Server</strong>
+        <span>9 tables, final schema synced with SQL, draw.io ERD, and role-based recommendation</span>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Faculty Network Operations</p>
+          <h1 id="pageTitle">Smart Campus WiFi Management</h1>
+        </div>
+        <div class="top-actions">
+          <div class="search-box">
+            <span>Search</span>
+            <input id="globalSearch" placeholder="user, device, access point">
+          </div>
+          <button id="openAddDevice">Add Device</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" data-view-panel="overview">
+          <img src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1600&q=80" alt="University library study area">
+          <div class="hero-copy">
+            <p>Authenticated campus connectivity</p>
+            <h2>Track users, devices, sessions, access points, and bandwidth from one database-backed system.</h2>
+            <div class="hero-actions">
+              <button data-jump="database">Explore Database</button>
+              <button class="secondary" data-jump="sessions">Monitor Sessions</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="metrics" data-view-panel="overview">
+          <article>
+            <span>Active Sessions</span>
+            <strong id="activeSessions">0</strong>
+            <small>Allowed and online</small>
+          </article>
+          <article>
+            <span>Registered Devices</span>
+            <strong id="deviceCount">0</strong>
+            <small>Trusted MAC addresses</small>
+          </article>
+          <article>
+            <span>Traffic Today</span>
+            <strong id="usageToday">0 MB</strong>
+            <small>Download + upload</small>
+          </article>
+          <article>
+            <span>DB Objects</span>
+            <strong>17</strong>
+            <small>Tables, views, procedures, triggers</small>
+          </article>
+        </section>
+
+        <section class="dashboard-grid" data-view-panel="overview">
+          <article class="panel span-2">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Live Monitoring</p>
+                <h2>Current Connections</h2>
+              </div>
+              <button id="refreshBtn" class="small-btn">Refresh</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Device</th>
+                    <th>Access Point</th>
+                    <th>Duration</th>
+                    <th>Usage</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionsTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Bandwidth</p>
+            <h2>Role Limits</h2>
+            <div id="roleLimitList" class="stack-list"></div>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Security</p>
+            <h2>Denied Logins</h2>
+            <div id="deniedList" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid" data-view-panel="overview">
+          <article class="panel span-2">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Recommendation</p>
+                <h2>Smart WiFi Suggestion</h2>
+              </div>
+              <select id="recommendationUser" aria-label="Choose user for recommendation"></select>
+            </div>
+            <div id="recommendationCard" class="recommendation-card"></div>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Requirements</p>
+            <h2>Project Rules</h2>
+            <div id="requirementList" class="stack-list"></div>
+          </article>
+        </section>
+
+        <section class="view hidden" data-view-panel="database">
+          <div class="page-intro">
+            <p class="eyebrow">Database Lab</p>
+            <h2>The database part of the project</h2>
+            <p>The website now matches the final SQL submission: same table names, same foreign keys, same recommendation logic, and the same lab-style objects.</p>
+          </div>
+
+          <div class="db-object-grid" id="dbObjectGrid"></div>
+
+          <div class="dashboard-grid">
+            <article class="panel">
+              <p class="eyebrow">FK Map</p>
+              <h2>Relationships</h2>
+              <div id="relationshipList" class="stack-list"></div>
+            </article>
+            <article class="panel span-2">
+              <div class="section-title">
+                <div>
+                  <p class="eyebrow">Physical Schema</p>
+                  <h2>Final Table Mapping</h2>
+                </div>
+                <span class="badge neutral">Synced with SQL file</span>
+              </div>
+              <div id="schemaCards" class="schema-grid"></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel span-2">
+              <div class="section-title">
+                <div>
+                  <p class="eyebrow">ERD</p>
+                  <h2>Logical Model</h2>
+                </div>
+                <span class="badge neutral">Final draw.io entities</span>
+              </div>
+              <div class="erd-board" id="erdBoard"></div>
+            </article>
+
+            <article class="panel">
+              <p class="eyebrow">Constraints</p>
+              <h2>Data Integrity</h2>
+              <div id="constraintList" class="stack-list"></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel">
+              <p class="eyebrow">Procedures</p>
+              <h2>Reusable Logic</h2>
+              <div id="procedureList" class="stack-list"></div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Triggers</p>
+              <h2>Project Note</h2>
+              <div id="triggerList" class="stack-list"></div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Views</p>
+              <h2>Reporting Layer</h2>
+              <div id="viewList" class="stack-list"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">SQL Demo</p>
+                <h2>Queries shown in the project</h2>
+              </div>
+              <select id="sqlSelector" aria-label="Choose SQL example"></select>
+            </div>
+            <pre class="code-box"><code id="sqlPreview"></code></pre>
+          </article>
+        </section>
+
+        <section class="view hidden" data-view-panel="users">
+          <div class="page-intro">
+            <p class="eyebrow">Users Table</p>
+            <h2>Students, staff, admins, and guests</h2>
+          </div>
+          <article class="panel">
+            <div class="section-title">
+              <h2>User Records</h2>
+              <select id="roleFilter">
+                <option value="All">All roles</option>
+                <option>Student</option>
+                <option>Staff</option>
+                <option>Admin</option>
+                <option>Guest</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>University ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Daily Limit</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="view hidden" data-view-panel="devices">
+          <div class="page-intro">
+            <p class="eyebrow">Devices Table</p>
+            <h2>Registered devices and MAC validation</h2>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel span-2">
+              <div class="section-title">
+                <h2>Trusted Devices</h2>
+                <button id="openAddDeviceAlt" class="small-btn">Register New</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Owner</th>
+                      <th>Device</th>
+                      <th>MAC Address</th>
+                      <th>Type</th>
+                      <th>Trusted</th>
+                    </tr>
+                  </thead>
+                  <tbody id="devicesTable"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Validation</p>
+              <h2>MAC Format</h2>
+              <p class="muted-text">The database stores each MAC address as a unique `CHAR(17)` value. The interface validates the same format before adding a device.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="view hidden" data-view-panel="sessions">
+          <div class="page-intro">
+            <p class="eyebrow">Sessions Table</p>
+            <h2>Authentication attempts and active connections</h2>
+          </div>
+          <article class="panel">
+            <div class="section-title">
+              <h2>Session History</h2>
+              <select id="statusFilter">
+                <option value="All">All statuses</option>
+                <option>Allowed</option>
+                <option>Denied</option>
+                <option>Expired</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Device</th>
+                    <th>Access Point</th>
+                    <th>Login</th>
+                    <th>Usage</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="view hidden" data-view-panel="network">
+          <div class="page-intro">
+            <p class="eyebrow">Computer Network</p>
+            <h2>WiFi networks and access points</h2>
+            <p>The network side is now aligned with the final SQL model: every access point belongs to a WiFi network and every session uses one access point.</p>
+          </div>
+          <div id="topologyBoard" class="topology-board"></div>
+          <div class="network-map">
+            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1500&q=80" alt="Network infrastructure">
+            <div id="apList" class="ap-list"></div>
+          </div>
+        </section>
+
+        <section class="view hidden" data-view-panel="reports">
+          <div class="page-intro">
+            <p class="eyebrow">Reports</p>
+            <h2>Database-driven analysis</h2>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel">
+              <p class="eyebrow">Top Usage</p>
+              <h2>Daily Consumers</h2>
+              <div id="usageList" class="stack-list"></div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Access Point Load</p>
+              <h2>Traffic by Location</h2>
+              <div id="apLoadList" class="stack-list"></div>
+            </article>
+            <article class="panel">
+              <p class="eyebrow">Audit</p>
+              <h2>Admin Actions</h2>
+              <div id="auditList" class="stack-list"></div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="deviceDialog">
+    <form id="deviceForm" method="dialog">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Devices CRUD</p>
+          <h2>Register Trusted Device</h2>
+        </div>
+        <button type="button" class="ghost-btn" id="closeDeviceDialog">Close</button>
+      </div>
+      <label>
+        Owner
+        <select name="userId" id="deviceOwner"></select>
+      </label>
+      <label>
+        Device Name
+        <input name="deviceName" value="New Campus Device" required>
+      </label>
+      <label>
+        MAC Address
+        <input name="mac" value="34:AB:19:7D:22:01" pattern="^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$" required>
+      </label>
+      <label>
+        Device Type
+        <select name="type">
+          <option>Mobile</option>
+          <option>Laptop</option>
+          <option>Tablet</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <button type="submit">Insert Device Record</button>
+      <p id="formMessage" class="form-message" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
